@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  grist:
+    image: gristlabs/grist
+    volumes: 
+      - grist-data:/persist
+
+    networks:
+      traefik-public:
+
+    env_file:
+      - ./.env
+
+    environment:
+      APP_HOME_URL: https://$GRIST_DOMAIN
+      APP_DOC_URL: https://$GRIST_DOMAIN
+      GRIST_SINGLE_ORG: docs
+      GRIST_ORG_IN_PATH: true
+
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+
+        - traefik.http.routers.$STACK_NAME-http.rule=Host(`$GRIST_DOMAIN`)
+        - traefik.http.routers.$STACK_NAME-http.entrypoints=http
+        - traefik.http.routers.$STACK_NAME-http.middlewares=https-redirect
+
+        - traefik.http.routers.$STACK_NAME-https.rule=Host(`$GRIST_DOMAIN`)
+        - traefik.http.routers.$STACK_NAME-https.entrypoints=https
+        - traefik.http.routers.$STACK_NAME-https.tls=true
+        - traefik.http.routers.$STACK_NAME-https.tls.certresolver=le
+        - traefik.http.services.grist.loadbalancer.server.port=8484
+
+volumes:
+  grist-data:
+
+networks:
+  traefik-public:
+    external: true
+    name: traefik-public
+

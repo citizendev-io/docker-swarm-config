@@ -1,12 +1,14 @@
 #!/bin/bash
 
-ProgName=$(basename $0)
-DefaultStackName=$(basename $PWD)
-StackName=${2:-$DefaultStackName}
+# TODO: Check for existing stack name.
+
+SCRIPT_NAME=$(basename $0)
+DEFAULT_STACK_NAME=$(basename $PWD)
+STACK_NAME=${2:-$DEFAULT_STACK_NAME}
 
 
 sub_help(){
-    echo "Usage: $ProgName <subcommand> [options]"
+    echo "Usage: $SCRIPT_NAME <subcommand> [options]"
     echo "Subcommands:"
     echo "    up"
     echo "    down"
@@ -16,24 +18,24 @@ sub_help(){
 }
 
 sub_up() {
-        docker stack deploy -c <(docker-compose config) $StackName
+    docker stack deploy -c <(STACK_NAME=$STACK_NAME docker-compose config) $StackName
 }
 
 sub_down() {
-        docker stack rm $StackName
+    docker stack rm $STACK_NAME
 }
 
 sub_services() {
-        docker stack ps $StackName
+    docker stack ps $STACK_NAME
 }
 
 sub_ps() {
-        docker stack services $StackName
+    docker stack services $STACK_NAME
 }
 
 sub_full_reload() {
-        sub_down $@
-        sub_up $@
+    sub_down $@
+    sub_up $@
 }
 
 
@@ -47,7 +49,7 @@ case $subcommand in
         sub_${subcommand} $@
         if [ $? = 127 ]; then
             echo "Error: '$subcommand' is not a known subcommand." >&2
-            echo "       Run '$ProgName --help' for a list of known subcommands." >&2
+            echo "       Run '$SCRIPT_NAME --help' for a list of known subcommands." >&2
             exit 1
         fi
         ;;

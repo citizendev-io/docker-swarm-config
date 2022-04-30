@@ -1,0 +1,134 @@
+version: "3.9"
+
+# optional ports are specified throughout for more advanced use cases.
+
+services:
+  app-service:
+    image: budibase/apps:latest
+    environment:
+      SELF_HOSTED: 1
+      COUCH_DB_URL: http://${COUCH_DB_USER}:${COUCH_DB_PASSWORD}@couchdb-service:5984
+      WORKER_URL: http://worker-service:4003
+      MINIO_URL: http://minio-service:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
+      BUDIBASE_ENVIRONMENT: ${BUDIBASE_ENVIRONMENT}
+      PORT: 4002
+      JWT_SECRET: ${JWT_SECRET}
+      LOG_LEVEL: info
+      SENTRY_DSN: https://a34ae347621946bf8acded18e5b7d4b8@o420233.ingest.sentry.io/5338131
+      ENABLE_ANALYTICS: "true"
+      REDIS_URL: redis-service:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      default:
+
+  worker-service:
+    image: budibase/worker:v1.0.46
+    environment:
+      SELF_HOSTED: 1
+      PORT: 4003
+      CLUSTER_PORT: ${MAIN_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_URL: http://minio-service:9000
+      APPS_URL: http://app-service:4002
+      COUCH_DB_USERNAME: ${COUCH_DB_USER}
+      COUCH_DB_PASSWORD: ${COUCH_DB_PASSWORD}
+      COUCH_DB_URL: http://${COUCH_DB_USER}:${COUCH_DB_PASSWORD}@couchdb-service:5984
+      SENTRY_DSN: https://a34ae347621946bf8acded18e5b7d4b8@o420233.ingest.sentry.io/5338131
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
+      REDIS_URL: redis-service:6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      default:
+
+  minio-service:
+    image: minio/minio
+    deploy:
+      placement:
+        constraints:
+          - node.labels.$STACK_NAME.minio == true
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_BROWSER: "off"
+    command: server /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      default:
+
+  couchdb-service:
+    image: ibmcom/couchdb3
+    environment:
+      - COUCHDB_PASSWORD=${COUCH_DB_PASSWORD}
+      - COUCHDB_USER=${COUCH_DB_USER}
+    deploy:
+      placement:
+        constraints:
+          - node.labels.$STACK_NAME.couchdb == true
+    volumes:
+      - couchdb3_data:/opt/couchdb/data
+    networks:
+      default:
+
+  redis-service:
+    image: redis
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    networks:
+      default:
+
+  proxy-service:
+    image: envoyproxy/envoy:v1.16-latest
+    deploy:
+      placement:
+        constraints:
+          - node.labels.$STACK_NAME.envoy == true
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+
+        - traefik.http.routers.$STACK_NAME-http.rule=Host(`$DOMAIN_NAME`)
+        - traefik.http.routers.$STACK_NAME-http.entrypoints=http
+        - traefik.http.routers.$STACK_NAME-http.middlewares=https-redirect
+
+        - traefik.http.routers.$STACK_NAME-https.rule=Host(`$DOMAIN_NAME`)
+        - traefik.http.routers.$STACK_NAME-https.entrypoints=https
+        - traefik.http.routers.$STACK_NAME-https.tls=true
+        - traefik.http.routers.$STACK_NAME-https.tls.certresolver=le
+
+        - traefik.http.services.$STACK_NAME.loadbalancer.server.port=10000
+
+    volumes:
+      - ./envoy.yaml:/etc/envoy/envoy.yaml
+    networks:
+      default:
+      traefik-public:
+
+
+
+volumes:
+  couchdb3_data:
+    driver: local
+  minio_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  traefik-public:
+    external: true
+    name: traefik-public
+    driver: overlay
+  default:
+
+
