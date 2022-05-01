@@ -1,0 +1,99 @@
+version: '3.8'
+services:
+  database:
+    image: postgis/postgis:13-master
+    volumes:
+      - directus_db:/var/lib/postgresql/data
+    networks:
+      - directus
+    env_file:
+      - ./.env
+    environment:
+    deploy:
+      placement:
+        constraints:
+          - node.labels.$STACK_NAME.database == true
+
+  cache:
+    image: redis:6
+    networks:
+      - directus
+
+  directus:
+    image: directus/directus:latest
+    volumes:
+      # By default, uploads are stored in /directus/uploads
+      # Always make sure your volumes matches the storage root when using
+      # local driver
+      - directus_uploads:/directus/uploads
+      # Make sure to also mount the volume when using SQLite
+      # - ./database:/directus/database
+      # If you want to load extensions from the host
+      # - ./extensions:/directus/extensions
+    command: >
+      sh -c "
+        npm install directus-extension-wpslug-interface
+        npx directus bootstrap && npx directus start
+      "
+    networks:
+      - directus
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.$STACK_NAME.uploads == true
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+
+        - traefik.http.routers.$STACK_NAME-http.rule=Host(`$DOMAIN`)
+        - traefik.http.routers.$STACK_NAME-http.entrypoints=http
+        - traefik.http.routers.$STACK_NAME-http.middlewares=https-redirect
+
+        - traefik.http.routers.$STACK_NAME-https.rule=Host(`$DOMAIN`)
+        - traefik.http.routers.$STACK_NAME-https.entrypoints=https
+        - traefik.http.routers.$STACK_NAME-https.tls=true
+        - traefik.http.routers.$STACK_NAME-https.tls.certresolver=le
+
+        - traefik.http.services.$STACK_NAME.loadbalancer.server.port=8055
+
+        - traefik.http.middlewares.$STACK_NAME-cors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT
+        - traefik.http.middlewares.$STACK_NAME-cors.headers.accesscontrolallowheaders=Authorization,Content-Type
+        - traefik.http.middlewares.$STACK_NAME-cors.headers.accesscontrolalloworiginlist=$ALLOWED_ORIGINS
+        - traefik.http.middlewares.$STACK_NAME-cors.headers.accesscontrolmaxage=100
+        - traefik.http.middlewares.$STACK_NAME-cors.headers.accesscontrolallowcredentials=true
+        - traefik.http.middlewares.$STACK_NAME-cors.headers.addvaryheader=true
+
+        - traefik.http.routers.$STACK_NAME-https.middlewares=$STACK_NAME-cors
+
+    env_file:
+      - ./.env
+
+    environment:
+      PUBLIC_URL: 'https://$DOMAIN'
+      DB_CLIENT: 'pg'
+      DB_HOST: 'database'
+      DB_PORT: '5432'
+      DB_DATABASE: '$POSTGRES_DB'
+      DB_USER: '$POSTGRES_USER'
+      DB_PASSWORD: '$POSTGRES_PASSWORD'
+      DB_POOL_MIN: 0
+
+      CACHE_ENABLED: 'true'
+      CACHE_STORE: 'redis'
+      CACHE_REDIS: 'redis://cache:6379'
+
+
+networks:
+  directus:
+
+  traefik-public:
+    external: true
+    name: traefik-public
+
+
+volumes:
+  directus_db:
+  directus_uploads:
+
