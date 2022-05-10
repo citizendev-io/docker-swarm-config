@@ -4,6 +4,9 @@ services:
   mysql:
     image: mariadb:latest
     deploy:
+      placement:
+        constraints:
+          - node.labels.data == true
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -21,7 +24,7 @@ services:
       - default
 
   wordpress:
-    image: trafex/wordpress
+    image: antran2202/docker-wordpress:wp5.9.3_php7.4
     deploy:
       replicas: 1
       update_config:
@@ -46,7 +49,7 @@ services:
         - traefik.http.routers.$STACK_NAME-https.entrypoints=https
         - traefik.http.routers.$STACK_NAME-https.tls=true
         - traefik.http.routers.$STACK_NAME-https.tls.certresolver=le
-        - traefik.http.services.grist.loadbalancer.server.port=8484
+        - traefik.http.services.$STACK_NAME.loadbalancer.server.port=80
 
     environment:
         DB_HOST: mysql
@@ -56,8 +59,7 @@ services:
         WORDPRESS_TABLE_PREFIX: wp_
         WORDPRESS_SITE_URL: https://$DOMAIN
         FS_METHOD: direct
-    depends_on:
-      - mysql
+
     volumes:
       - wp_content:/var/www/wp-content
     networks:
