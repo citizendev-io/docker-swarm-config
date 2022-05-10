@@ -17,8 +17,15 @@
       "env": [
         {
           "name": "STACK_NAME", 
-          "label": "stack name",
-          "description": "name of this current stack"
+          "label": "Stack name",
+          "description": "Name of this current stack. Must contain only alphabet characters, number, dash (-) and underscore (_). Must be unique",
+          "default": "wordpress-application"
+        },
+        {
+          "name": "DOMAIN", 
+          "label": "Domain name",
+          "description": "Domain name for this application. Must point the DNS record to the cluster ingress endpoint.",
+          "default": "application.dev.youngit.org"
         }
       ]
     },
