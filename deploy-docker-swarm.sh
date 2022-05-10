@@ -18,7 +18,7 @@ sub_help(){
 }
 
 sub_up() {
-    docker stack deploy -c <(STACK_NAME=$STACK_NAME docker-compose config) $StackName
+    docker stack deploy -c <(STACK_NAME=$STACK_NAME docker-compose config) $STACK_NAME
 }
 
 sub_down() {
