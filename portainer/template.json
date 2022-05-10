@@ -1,0 +1,26 @@
+{
+  "version": "2",
+  "templates": [
+    {
+      "type": 2,
+      "title": "Wordpress",
+      "name": "wordpress",
+      "description": "Wordpress Installation",
+      "categories": ["swarm", "web"],
+      "platform": "linux",
+      "logo": "https://s.w.org/style/images/about/WordPress-logotype-wmark.png",
+      "image": "registry:latest",
+      "repository": {
+        "url": "https://github.com/antran22/docker-swarm-config",
+        "stackfile": "services/wordpress/docker-compose.yml"
+      }
+      "env": [
+        {
+          "name": "STACK_NAME", 
+          "label": "stack name",
+          "description": "name of this current stack"
+        }
+      ]
+    }
+  ]
+}

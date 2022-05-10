@@ -37,7 +37,7 @@ volumes:
   grist-data:
 
 networks:
-  traefik-public:
+  traefi-public:
     external: true
     name: traefik-public
 
