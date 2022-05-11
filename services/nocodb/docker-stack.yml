@@ -1,0 +1,69 @@
+version: "3.7"
+
+services:
+  nocodb:
+    image: nocodb/nocodb:latest
+    volumes:
+      - data:/usr/app/data
+    env_file:
+      - .env
+    networks:
+      internal:
+      traefik-public:
+    environment:
+      - NC_DB=pg://nocodb-db:5432?u=postgres&p=postgres&d=nocodb
+      - NC_PUBLIC_URL=https://${DOMAIN}
+      - NC_DISABLE_TELE=true
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+
+        - traefik.http.routers.${STACK_NAME}-http.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect
+
+        - traefik.http.routers.${STACK_NAME}-https.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-https.tls=true
+        - traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le
+
+        - traefik.http.services.${STACK_NAME}.loadbalancer.server.port=8080
+
+
+
+  postgres:
+    image: postgres:12.1-alpine
+    env_file:
+      - .env
+    networks:
+      internal:
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: nocodb
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U postgres -d nocodb
+      interval: 10s
+      timeout: 2s
+      retries: 10
+    deploy:
+      placement:
+        constraints:
+          - node.labels.data == true
+
+networks:
+  internal:
+
+  traefik-public:
+    external: true
+    name: traefik-public
+
+volumes:
+  data:
+  postgres:
+
+
