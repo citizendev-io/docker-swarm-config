@@ -5,13 +5,11 @@ services:
     image: nocodb/nocodb:latest
     volumes:
       - data:/usr/app/data
-    env_file:
-      - .env
     networks:
       internal:
       traefik-public:
     environment:
-      - NC_DB=pg://nocodb-db:5432?u=postgres&p=postgres&d=nocodb
+      - NC_DB=pg://postgres:5432?u=postgres&p=postgres&d=nocodb
       - NC_PUBLIC_URL=https://${DOMAIN}
       - NC_DISABLE_TELE=true
     deploy:
@@ -35,8 +33,6 @@ services:
 
   postgres:
     image: postgres:12.1-alpine
-    env_file:
-      - .env
     networks:
       internal:
     environment:

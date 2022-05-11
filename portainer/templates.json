@@ -32,7 +32,7 @@
       "type": 2,
       "title": "NocoDB",
       "name": "nocodb",
-      "description": "NocoDB use ",
+      "description": "NocoDB instance with Postgres database",
       "categories": ["data","nocode"],
       "platform": "linux",
       "logo": "https://www.nocodb.com/brand/x.png",
