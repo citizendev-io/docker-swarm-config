@@ -26,6 +26,7 @@ services:
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
       DEFAULT_LANGUAGE: en_US 
       FORCE_HTTPS: "false"
+      PGSSLMODE: disable
 
 
     deploy:
