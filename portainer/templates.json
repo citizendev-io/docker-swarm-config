@@ -54,6 +54,33 @@
           "default": "application.example.org"
         }
       ]
+    },
+    {
+      "type": 2,
+      "title": "Outline Knowledge Base",
+      "name": "outline-kb",
+      "description": "Outline Knowledge Base with Postgres",
+      "categories": ["wiki", "web"],
+      "platform": "linux",
+      "logo": "https://www.getoutline.com/images/logo.svg",
+      "repository": {
+        "url": "https://github.com/antran22/docker-swarm-config",
+        "stackfile": "services/outline/docker-stack.yml"
+      },
+      "env": [
+        {
+          "name": "STACK_NAME", 
+          "label": "Stack name",
+          "description": "Name of this current stack. Set to be the same as the Name.",
+          "default": "outline-kb"
+        },
+        {
+          "name": "DOMAIN", 
+          "label": "Domain name",
+          "description": "Domain name for this application. Must point the DNS record to the cluster ingress endpoint.",
+          "default": "application.example.org"
+        }
+      ]
     }
   ]
 }

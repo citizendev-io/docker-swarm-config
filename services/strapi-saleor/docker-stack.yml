@@ -1,0 +1,158 @@
+version: '3.8'
+services:
+  ##################### Srapi #############################
+  strapi:
+    image: antran2202/dcc-strapi:latest
+    environment:
+      DATABASE_CLIENT: postgres
+      DATABASE_NAME: strapi
+      DATABASE_HOST: strapi_postgres
+      DATABASE_PORT: 5432
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi
+    networks:
+      ingress:
+      default:
+    depends_on:
+      - postgres
+    volumes:
+      - strapi-uploads:/app/public/uploads
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+
+        - traefik.http.routers.${STACK_NAME}-strapi-http.rule=Host(`${STRAPI_DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-strapi-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-strapi-http.middlewares=https-redirect
+
+        - traefik.http.routers.${STACK_NAME}-strapi-https.rule=Host(`${STRAPI_DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-strapi-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-strapi-https.tls=true
+        - traefik.http.routers.${STACK_NAME}-strapi-https.tls.certresolver=le
+        - traefik.http.services.${STACK_NAME}-strapi.loadbalancer.server.port=80
+
+  strapi_postgres:
+    image: postgres
+    environment:
+      POSTGRES_DB: strapi
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    deploy:
+      placement:
+        constraints:
+          - node.labels.data == true
+
+  ##################### Saleor #############################
+
+  saleor_api:
+    image: saleor-platform_api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl http://localhost:8000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - saleor-backend-tier
+      - ingress
+      volumes:
+      - ./saleor/saleor/:/app/saleor:Z
+      - ./saleor/templates/:/app/templates:Z
+      - ./saleor/tests/:/app/tests
+      # shared volume between worker and api for media
+      - saleor-media:/app/media
+    command: python manage.py runserver 0.0.0.0:8000
+    environment:
+      DEFAULT_CHANNEL_SLUG: default-channel
+    env_file:
+      - saleor.env
+
+  saleor_worker:
+    image: saleor-platform_api
+    command: celery -A saleor --app=saleor.celeryconf:app worker --loglevel=info -B
+    restart: unless-stopped
+    networks:
+      - saleor
+    environment:
+      DEFAULT_CHANNEL_SLUG: default-channel
+    env_file:
+      - saleor.env
+    depends_on:
+      - redis
+    volumes:
+      - ./saleor/saleor/:/app/saleor:Z,cached
+      - ./saleor/templates/:/app/templates:Z,cached
+      # shared volume between worker and api for media
+      - saleor-media:/app/media
+
+    deploy:
+      placement:
+        constraints:
+          - node.labels.data == true
+
+  dashboard:
+    image: saleor-platform_dashboard
+    restart: unless-stopped
+    networks:
+      - saleor
+      - traefik-public
+
+  saleor_db:
+    image: library/postgres:11-alpine
+    ports:
+      - 5432:5432
+    restart: unless-stopped
+    networks:
+      - saleor
+    volumes:
+      - saleor_db:/var/lib/postgresql/data
+      - ./replica_user.sql:/docker-entrypoint-initdb.d/replica_user.sql
+    environment:
+      - POSTGRES_USER=saleor
+      - POSTGRES_PASSWORD=saleor
+    deploy:
+      placement:
+        constraints:
+          - node.labels.data == true
+
+  redis:
+    image: library/redis:5.0-alpine
+    ports:
+      - 6379:6379
+    restart: unless-stopped
+    networks:
+      - saleor
+
+volumes:
+  saleor-db:
+    driver: local
+  saleor-redis:
+    driver: local
+  saleor-media:
+
+networks:
+    ingress:
+    external: true
+
+
+
+volumes:
+  postgres-data:
+  strapi-uploads:
+
+networks:
+  traefik-public:
+    external: true
+    name: traefik-public
+
+  saleor:
+    driver: bridge
+
+  strapi:
+
+
+
