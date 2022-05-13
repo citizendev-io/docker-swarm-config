@@ -79,6 +79,81 @@
           "label": "Domain name",
           "description": "Domain name for this application. Must point the DNS record to the cluster ingress endpoint.",
           "default": "application.example.org"
+        },
+        {
+          "name": "SECRET_KEY",
+          "label": "Secret Key",
+          "description": "Application Secret Key. Generate a random string for this"
+        },
+        {
+          "name": "UTILS_SECRET",
+          "label": "Utils Secret",
+          "description": "Application Secret Key. Generate a random string for this"
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "label": "AWS Access Key ID",
+          "description": "AWS Access Key ID"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "label": "AWS Secret Access Key",
+          "description": "AWS Secret Access Key"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "label": "AWS Secret Access Key",
+          "description": "AWS Secret Access Key"
+        },
+        {
+          "name": "AWS_REGION",
+          "label": "AWS Region",
+          "description": "AWS Region",
+          "default": "ap-southeast-1"
+        },
+        {
+          "name": "AWS_S3_UPLOAD_BUCKET_URL",
+          "label": "AWS Upload Bucket URL",
+          "description": "AWS Upload Bucket URL"
+        },
+        {
+          "name": "AWS_S3_UPLOAD_BUCKET_NAME",
+          "label": "AWS Upload Bucket Name",
+          "description": "AWS Upload Bucket Name",
+          "default": "outline-bucket"
+        },
+        {
+          "name": "AWS_S3_UPLOAD_MAX_SIZE",
+          "label": "AWS S3 Upload Max Size",
+          "description": "AWS S3 Upload Max Size"
+        },
+        {
+          "name": "GOOGLE_CLIENT_ID",
+          "label": "Google Client ID",
+          "description": "Google Client ID for OAuth"
+        },
+        {
+          "name": "GOOGLE_CLIENT_SECRET",
+          "label": "Google Client Secret",
+          "description": "Google Client Secret for OAuth"
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "label": "Postgres Password",
+          "description": "Postgres Password",
+          "default": "postgres_password"
+        },
+        {
+          "name": "POSTGRES_USER",
+          "label": "Postgres User",
+          "description": "Postgres User",
+          "default": "postgres"
+        },
+        {
+          "name": "POSTGRES_DB",
+          "label": "Postgres Database",
+          "description": "Postgres Database",
+          "default": "outline"
         }
       ]
     }
