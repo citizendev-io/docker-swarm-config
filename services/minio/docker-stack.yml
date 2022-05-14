@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+  minio:
+    image: quay.io/minio/minio:latest
+    command: server /data --console-address ":9001" 
+    expose:
+      - "9000"
+      - "9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    volumes:
+      - data:/data
+
+    networks:
+      - traefik-public
+    deploy:
+      placement:
+        constraints:
+          - node.labels.data == true
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+
+        - traefik.http.routers.${STACK_NAME}-http.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-http.service=${STACK_NAME}
+
+        - traefik.http.routers.${STACK_NAME}-https.rule=Host(`${DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-https.tls=true
+        - traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le
+        - traefik.http.routers.${STACK_NAME}-https.service=${STACK_NAME}
+
+        - traefik.http.services.${STACK_NAME}.loadbalancer.server.port=9000
+
+        - traefik.http.routers.${STACK_NAME}-console-http.rule=Host(`console.${DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-console-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-console-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-console-http.service=${STACK_NAME}
+
+        - traefik.http.routers.${STACK_NAME}-console-https.rule=Host(`console.${DOMAIN}`)
+        - traefik.http.routers.${STACK_NAME}-console-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-console-https.tls=true
+        - traefik.http.routers.${STACK_NAME}-console-https.tls.certresolver=le
+        - traefik.http.routers.${STACK_NAME}-console-https.service=${STACK_NAME}-console
+
+        - traefik.http.services.${STACK_NAME}-console.loadbalancer.server.port=9001
+
+
+networks:
+
+  traefik-public:
+    external: true
+    name: traefik-public
+
+
+volumes:
+  data:
+

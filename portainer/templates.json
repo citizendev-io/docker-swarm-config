@@ -101,11 +101,6 @@
           "description": "AWS Secret Access Key"
         },
         {
-          "name": "AWS_SECRET_ACCESS_KEY",
-          "label": "AWS Secret Access Key",
-          "description": "AWS Secret Access Key"
-        },
-        {
           "name": "AWS_REGION",
           "label": "AWS Region",
           "description": "AWS Region",
@@ -125,7 +120,8 @@
         {
           "name": "AWS_S3_UPLOAD_MAX_SIZE",
           "label": "AWS S3 Upload Max Size",
-          "description": "AWS S3 Upload Max Size"
+          "description": "AWS S3 Upload Max Size",
+          "default": "26214400"
         },
         {
           "name": "GOOGLE_CLIENT_ID",
@@ -154,6 +150,45 @@
           "label": "Postgres Database",
           "description": "Postgres Database",
           "default": "outline"
+        }
+      ]
+    },
+    {
+      "type": 2,
+      "title": "Minio",
+      "name": "minio",
+      "description": "Minio",
+      "categories": ["storage", "s3"],
+      "platform": "linux",
+      "logo": "https://repository-images.githubusercontent.com/29261473/ff41a900-6bfa-11e9-95fe-aa27fe8b337b",
+      "repository": {
+        "url": "https://github.com/antran22/docker-swarm-config",
+        "stackfile": "services/minio/docker-stack.yml"
+      },
+      "env": [
+        {
+          "name": "STACK_NAME", 
+          "label": "Stack name",
+          "description": "Name of this current stack. Set to be the same as the Name.",
+          "default": "minio-application"
+        },
+        {
+          "name": "DOMAIN", 
+          "label": "Domain name",
+          "description": "Domain name for this application. Must point the DNS record to the cluster ingress endpoint. Note that a subdomain of console.* is also needed",
+          "default": "application.example.org"
+        },
+        {
+          "name": "MINIO_ROOT_USER", 
+          "label": "Minio root username",
+          "description": "Minio root username",
+          "default": "user"
+        },
+        {
+          "name": "MINIO_ROOT_PASSWORD", 
+          "label": "Minio root password",
+          "description": "Minio root password",
+          "default": "password"
         }
       ]
     }
