@@ -30,6 +30,39 @@
     },
     {
       "type": 2,
+      "title": "Wordpress with Redirection Domain",
+      "name": "wordpress-with-redirect",
+      "description": "Wordpress Installation with Redirection Domain",
+      "categories": ["web", "cms"],
+      "platform": "linux",
+      "logo": "https://s.w.org/style/images/about/WordPress-logotype-wmark.png",
+      "repository": {
+        "url": "https://github.com/antran22/docker-swarm-config",
+        "stackfile": "services/wordpress/docker-stack-with-redirect.yml"
+      },
+      "env": [
+        {
+          "name": "STACK_NAME", 
+          "label": "Stack name",
+          "description": "Name of this current stack. Set to be the same as the Name.",
+          "default": "wordpress-application"
+        },
+        {
+          "name": "DOMAIN", 
+          "label": "Domain name",
+          "description": "Domain name for this application. Must point the DNS record to the cluster ingress endpoint.",
+          "default": "application.example.org"
+        },
+        {
+          "name": "REDIRECT_DOMAIN", 
+          "label": "Redirect domain name",
+          "description": "Redirect domain name for this application. Access to this domain will be redirected to the main domain. Must point the DNS record to the cluster ingress endpoint.",
+          "default": "application.example.com"
+        }
+      ]
+    },
+    {
+      "type": 2,
       "title": "NocoDB",
       "name": "nocodb",
       "description": "NocoDB instance with Postgres database",
