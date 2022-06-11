@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   mysql:
-    image: mariadb:latest
+    image: mariadb:10.7.4-focal
     deploy:
       placement:
         constraints:
@@ -24,7 +24,7 @@ services:
       - default
 
   wordpress:
-    image: antran2202/docker-wordpress:wp5.9.3_php7.4
+    image: antran2202/docker-wordpress:wp6.0_php7.4
     deploy:
       placement:
         constraints:
@@ -88,7 +88,7 @@ services:
       MYSQL_PASSWORD: wordpress
 
   wpcontent_backup:
-    image: vladgh/s3sync
+    image: vladgh/s3sync:1.2.0
     deploy:
       placement:
         constraints:
