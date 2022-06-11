@@ -3,15 +3,15 @@
   "templates": [
     {
       "type": 2,
-      "title": "Wordpress",
+      "title": "Wordpress Single Domain",
       "name": "wordpress",
-      "description": "Wordpress Installation",
+      "description": "Wordpress Single Domain Installation",
       "categories": ["web", "cms"],
       "platform": "linux",
       "logo": "https://s.w.org/style/images/about/WordPress-logotype-wmark.png",
       "repository": {
         "url": "https://github.com/antran22/docker-swarm-config",
-        "stackfile": "services/wordpress/docker-stack.yml"
+        "stackfile": "services/wordpress/docker-stack-single-domain.yml"
       },
       "env": [
         {
@@ -25,6 +25,77 @@
           "label": "Domain name",
           "description": "Domain name for this application. Must point the DNS record to the cluster ingress endpoint.",
           "default": "application.example.org"
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "label": "AWS Access Key ID",
+          "description": "AWS Access Key ID"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "label": "AWS Secret Access Key",
+          "description": "AWS Secret Access Key"
+        },
+        {
+          "name": "AWS_REGION",
+          "label": "AWS Region",
+          "description": "AWS Region",
+          "default": "ap-southeast-1"
+        },
+        {
+          "name": "AWS_S3_UPLOAD_BUCKET_NAME",
+          "label": "AWS Upload Bucket Name",
+          "description": "AWS Upload Bucket Name",
+          "default": "wordpress-bucket"
+        }
+      ]
+    },
+    {
+      "type": 2,
+      "title": "Wordpress Multi Domain",
+      "name": "wordpress",
+      "description": "Wordpress Multi Domain Installation",
+      "categories": ["web", "cms"],
+      "platform": "linux",
+      "logo": "https://s.w.org/style/images/about/WordPress-logotype-wmark.png",
+      "repository": {
+        "url": "https://github.com/antran22/docker-swarm-config",
+        "stackfile": "services/wordpress/docker-stack-multi-domain.yml"
+      },
+      "env": [
+        {
+          "name": "STACK_NAME", 
+          "label": "Stack name",
+          "description": "Name of this current stack. Set to be the same as the Name.",
+          "default": "wordpress-application"
+        },
+        {
+          "name": "DOMAIN", 
+          "label": "Domain name",
+          "description": "Domain name for this application. Must point the DNS record to the cluster ingress endpoint.",
+          "default": "application.example.org"
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "label": "AWS Access Key ID",
+          "description": "AWS Access Key ID"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "label": "AWS Secret Access Key",
+          "description": "AWS Secret Access Key"
+        },
+        {
+          "name": "AWS_REGION",
+          "label": "AWS Region",
+          "description": "AWS Region",
+          "default": "ap-southeast-1"
+        },
+        {
+          "name": "AWS_S3_UPLOAD_BUCKET_NAME",
+          "label": "AWS Upload Bucket Name",
+          "description": "AWS Upload Bucket Name",
+          "default": "wordpress-bucket"
         }
       ]
     },
