@@ -24,7 +24,7 @@ services:
       - default
 
   wordpress:
-    image: antran2202/docker-wordpress:wp5.9.3_php7.4
+    image: antran2202/docker-wordpress:wp${WORDPRESS_VERSION}_php${PHP_VERSION}
     deploy:
       placement:
         constraints:

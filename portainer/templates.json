@@ -47,6 +47,18 @@
           "label": "AWS Upload Bucket Name",
           "description": "AWS Upload Bucket Name",
           "default": "wordpress-bucket"
+        },
+        {
+          "name": "WORDPRESS_VERSION", 
+          "label": "WordPress Version",
+          "description": "WordPress Version",
+          "default": "6.0.1"
+        },
+        {
+          "name": "PHP_VERSION", 
+          "label": "PHP Version",
+          "description": "PHP Version",
+          "default": "7.4"
         }
       ]
     },
@@ -96,7 +108,20 @@
           "label": "AWS Upload Bucket Name",
           "description": "AWS Upload Bucket Name",
           "default": "wordpress-bucket"
+        },
+        {
+          "name": "WORDPRESS_VERSION", 
+          "label": "WordPress Version",
+          "description": "WordPress Version",
+          "default": "6.0.1"
+        },
+        {
+          "name": "PHP_VERSION", 
+          "label": "PHP Version",
+          "description": "PHP Version",
+          "default": "7.4"
         }
+
       ]
     },
     {
@@ -129,7 +154,20 @@
           "label": "Redirect domain name",
           "description": "Redirect domain name for this application. Access to this domain will be redirected to the main domain. Must point the DNS record to the cluster ingress endpoint.",
           "default": "application.example.com"
+        },
+        {
+          "name": "WORDPRESS_VERSION", 
+          "label": "WordPress Version",
+          "description": "WordPress Version",
+          "default": "6.0.1"
+        },
+        {
+          "name": "PHP_VERSION", 
+          "label": "PHP Version",
+          "description": "PHP Version",
+          "default": "7.4"
         }
+
       ]
     },
     {
