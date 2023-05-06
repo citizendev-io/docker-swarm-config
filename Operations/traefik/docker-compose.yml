@@ -20,11 +20,6 @@ services:
         published: 8443
         target: 8443
 
-      - mode: host 
-        protocol: tcp 
-        published: 22
-        target: 22
-
     deploy:
       placement:
         constraints:
